@@ -1,44 +1,45 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const taskForm = document.getElementById("task-form");
-  const newTaskInput = document.getElementById("new-task");
-  const priorityDropdown = document.getElementById("priority-dropdown");
-  const taskList = document.getElementById("task-list");
-  const sortAscendingButton = document.getElementById("sort-ascending");
-  const sortDescendingButton = document.getElementById("sort-descending");
-
-  const tasksArray = [];
-
-  taskForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    const taskText = newTaskInput.value.trim();
-    const priority = priorityDropdown.value;
-
+  const taskInput = document.getElementById("new-task-description");
+  const taskList = document.getElementById("tasks");
+  const addTaskButton = document.getElementById("create-task-form");
+  const clearTasksButton = document.getElementById("clear-tasks");
+ 
+  function addTask(event) {
+    event.preventDefault(); // Prevent form submission behavior
+ 
+    const taskText = taskInput.value.trim();
+ 
     if (taskText !== "") {
-      const task = {
-        text: taskText,
-        priority: priority,
-      };
-      tasksArray.push(task);
-
+      const priority = prompt("Enter priority (High, Medium, Low):");
+      if (priority === null || priority === "") {
+        return; // Do not add the task if priority is not provided
+      }
+ 
       const listItem = document.createElement("li");
-      listItem.textContent = task.text;
-      setPriorityColor(listItem, task.priority);
-
+      listItem.textContent = taskText;
+ 
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "X";
+      deleteButton.className = "delete-task";
+      deleteButton.dataset.description = taskText;
+ 
+      listItem.appendChild(deleteButton);
       taskList.appendChild(listItem);
-      newTaskInput.value = "";
+      taskInput.value = "";
     }
-  });
-
-  sortAscendingButton.addEventListener("click", function () {
-    tasksArray.sort((a, b) => comparePriority(a.priority, b.priority));
-    displaySortedTasks();
-  });
-
-  sortDescendingButton.addEventListener("click", function () {
-    tasksArray.sort((a, b) => comparePriority(b.priority, a.priority));
-    displaySortedTasks();
-  });
-
+  }
+ 
+  function deleteTask(event) {
+    if (event.target.classList.contains("delete-task")) {
+      const taskDescription = event.target.dataset.description;
+      const taskItem = event.target.parentElement;
+ 
+      if (confirm(`Are you sure you want to delete "${taskDescription}"?`)) {
+        taskItem.remove();
+      }
+    }
+  }
+ 
   function setPriorityColor(taskItem, priority) {
     switch (priority) {
       case "High":
@@ -54,19 +55,91 @@ document.addEventListener("DOMContentLoaded", function () {
         taskItem.style.color = "black";
     }
   }
-
-  function comparePriority(priorityA, priorityB) {
-    const priorityOrder = ["High", "Medium", "Low"];
-    return priorityOrder.indexOf(priorityA) - priorityOrder.indexOf(priorityB);
+ 
+  const tasksArray = [];
+ 
+  function addTaskToList(event) {
+    event.preventDefault();
+ 
+    const taskText = taskInput.value.trim();
+ 
+    if (taskText !== "") {
+      const priority = prompt("Enter priority (High, Medium, Low):");
+      if (priority === null || priority === "") {
+        return; // Do not add the task if priority is not provided
+      }
+ 
+      const task = {
+        text: taskText,
+        priority: priority,
+      };
+      tasksArray.push(task);
+ 
+      const listItem = document.createElement("li");
+      listItem.textContent = task.text;
+      setPriorityColor(listItem, task.priority);
+ 
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "X";
+      deleteButton.className = "delete-task";
+      deleteButton.dataset.description = task.text;
+ 
+      listItem.appendChild(deleteButton);
+      taskList.appendChild(listItem);
+      taskInput.value = "";
+    }
   }
-
+ 
+  function sortByPriority() {
+    tasksArray.sort((a, b) => {
+      if (a.priority === "High" && b.priority !== "High") {
+        return -1;
+      } else if (a.priority !== "High" && b.priority === "High") {
+        return 1;
+      } else if (a.priority === "Medium" && b.priority === "Low") {
+        return -1;
+      } else if (a.priority === "Low" && b.priority === "Medium") {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
+ 
   function displaySortedTasks() {
+    sortByPriority();
     taskList.innerHTML = "";
+ 
     tasksArray.forEach((task) => {
       const listItem = document.createElement("li");
       listItem.textContent = task.text;
       setPriorityColor(listItem, task.priority);
+ 
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "X";
+      deleteButton.className = "delete-task";
+      deleteButton.dataset.description = task.text;
+ 
+      listItem.appendChild(deleteButton);
       taskList.appendChild(listItem);
     });
   }
+ 
+  addTaskButton.addEventListener("submit", addTaskToList);
+  clearTasksButton.addEventListener("click", function () {
+    taskList.innerHTML = "";
+    tasksArray.length = 0;
+  });
+ 
+  // Create Sort Tasks button and add event listener
+  const sortButton = document.createElement("button");
+  sortButton.textContent = "Sort Tasks";
+  sortButton.id = "sort-tasks";
+ 
+  sortButton.addEventListener("click", displaySortedTasks);
+ 
+  const form = document.getElementById("create-task-form");
+  form.appendChild(sortButton);
+ 
+  taskList.addEventListener("click", deleteTask);
 });

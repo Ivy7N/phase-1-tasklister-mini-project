@@ -4,37 +4,179 @@
   <meta charset="UTF-8">
   <title>Flatiron Task Lister</title>
   <link rel="stylesheet" href="./style.css">
-</head>
+ </head>
 <body>
   <div id="main-content">
     <h1>Task Lister Lite</h1>
-    <form id="create-task-form" action="#" method="POST">
+  <form id="create-task-form" action="#" method="POST">
       <label for="new-task-description">Task description:</label>
       <input type="text" id="new-task-description" name="new-task-description" placeholder="description">
-      <label for="priority">Priority:</label>
+      <label for="user">User:</label>
+      <input type="text" id="user" name="user" placeholder="User">
+      <label for="duration">Duration:</label>
+      <input type="text" id="duration" name="duration" placeholder="Duration">
+      <label for="date-due">Date Due:</label>
+      <input type="text" id="date-due" name="date-due" placeholder="Date Due">
       <select id="priority-dropdown">
         <option value="High">High</option>
         <option value="Medium">Medium</option>
         <option value="Low">Low</option>
       </select>
-      <label for="user">User:</label>
-      <input type="text" id="user" name="user" placeholder="user">
-      <label for="duration">Duration:</label>
-      <input type="text" id="duration" name="duration" placeholder="duration">
-      <label for="date-due">Date Due:</label>
-      <input type="text" id="date-due" name="date-due" placeholder="date due">
-      <input type="submit" value="Create New Task">    
+      <input type="submit" value="Create New Task">   
       <button id="clear-tasks">Clear All</button>
     </form>
-    <div id="sorting-options">
-      <button id="sort-ascending">Sort Ascending</button>
-      <button id="sort-descending">Sort Descending</button>
-    </div>
     <div id="list">
       <h2>My Todos</h2>
       <ul id="tasks">
       </ul>
     </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+  const taskInput = document.getElementById("new-task-description");
+  const taskList = document.getElementById("tasks");
+  const addTaskButton = document.getElementById("create-task-form");
+  const clearTasksButton = document.getElementById("clear-tasks");
+ 
+  function addTask(event) {
+    event.preventDefault(); // Prevent form submission behavior
+ 
+    const taskText = taskInput.value.trim();
+ 
+    if (taskText !== "") {
+      const priority = prompt("Enter priority (High, Medium, Low):");
+      if (priority === null || priority === "") {
+        return; // Do not add the task if priority is not provided
+      }
+ 
+      const listItem = document.createElement("li");
+      listItem.textContent = taskText;
+ 
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "X";
+      deleteButton.className = "delete-task";
+      deleteButton.dataset.description = taskText;
+ 
+      listItem.appendChild(deleteButton);
+      taskList.appendChild(listItem);
+      taskInput.value = "";
+    }
+  }
+ 
+  function deleteTask(event) {
+    if (event.target.classList.contains("delete-task")) {
+      const taskDescription = event.target.dataset.description;
+      const taskItem = event.target.parentElement;
+ 
+      if (confirm(`Are you sure you want to delete "${taskDescription}"?`)) {
+        taskItem.remove();
+      }
+    }
+  }
+ 
+  function setPriorityColor(taskItem, priority) {
+    switch (priority) {
+      case "High":
+        taskItem.style.color = "red";
+        break;
+      case "Medium":
+        taskItem.style.color = "yellow";
+        break;
+      case "Low":
+        taskItem.style.color = "green";
+        break;
+      default:
+        taskItem.style.color = "black";
+    }
+  }
+ 
+  const tasksArray = [];
+ 
+  function addTaskToList(event) {
+    event.preventDefault();
+ 
+    const taskText = taskInput.value.trim();
+ 
+    if (taskText !== "") {
+      const priority = prompt("Enter priority (High, Medium, Low):");
+      if (priority === null || priority === "") {
+        return; // Do not add the task if priority is not provided
+      }
+ 
+      const task = {
+        text: taskText,
+        priority: priority,
+      };
+      tasksArray.push(task);
+ 
+      const listItem = document.createElement("li");
+      listItem.textContent = task.text;
+      setPriorityColor(listItem, task.priority);
+ 
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "X";
+      deleteButton.className = "delete-task";
+      deleteButton.dataset.description = task.text;
+ 
+      listItem.appendChild(deleteButton);
+      taskList.appendChild(listItem);
+      taskInput.value = "";
+    }
+  }
+ 
+  function sortByPriority() {
+    tasksArray.sort((a, b) => {
+      if (a.priority === "High" && b.priority !== "High") {
+        return -1;
+      } else if (a.priority !== "High" && b.priority === "High") {
+        return 1;
+      } else if (a.priority === "Medium" && b.priority === "Low") {
+        return -1;
+      } else if (a.priority === "Low" && b.priority === "Medium") {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
+ 
+  function displaySortedTasks() {
+    sortByPriority();
+    taskList.innerHTML = "";
+ 
+    tasksArray.forEach((task) => {
+      const listItem = document.createElement("li");
+      listItem.textContent = task.text;
+      setPriorityColor(listItem, task.priority);
+ 
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "X";
+      deleteButton.className = "delete-task";
+      deleteButton.dataset.description = task.text;
+ 
+      listItem.appendChild(deleteButton);
+      taskList.appendChild(listItem);
+    });
+  }
+ 
+  addTaskButton.addEventListener("submit", addTaskToList);
+  clearTasksButton.addEventListener("click", function () {
+    taskList.innerHTML = "";
+    tasksArray.length = 0;
+  });
+ 
+  // Create Sort Tasks button and add event listener
+  const sortButton = document.createElement("button");
+  sortButton.textContent = "Sort Tasks";
+  sortButton.id = "sort-tasks";
+ 
+  sortButton.addEventListener("click", displaySortedTasks);
+ 
+  const form = document.getElementById("create-task-form");
+  form.appendChild(sortButton);
+ 
+  taskList.addEventListener("click", deleteTask);
+});
+    </script>
   </div>
 </body>
 </html>
