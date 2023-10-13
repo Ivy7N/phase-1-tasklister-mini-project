@@ -7,22 +7,34 @@
 </head>
 <body>
   <div id="main-content">
-    <h1>Task Lister Lite™️</h1>
-
-    <form id="create-task-form" action="" method="POST">
+    <h1>Task Lister Lite</h1>
+    <form id="create-task-form" action="#" method="POST">
       <label for="new-task-description">Task description:</label>
       <input type="text" id="new-task-description" name="new-task-description" placeholder="description">
-      <input type="submit" value="Create New Task">
+      <label for="priority">Priority:</label>
+      <select id="priority-dropdown">
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+      <label for="user">User:</label>
+      <input type="text" id="user" name="user" placeholder="user">
+      <label for="duration">Duration:</label>
+      <input type="text" id="duration" name="duration" placeholder="duration">
+      <label for="date-due">Date Due:</label>
+      <input type="text" id="date-due" name="date-due" placeholder="date due">
+      <input type="submit" value="Create New Task">    
+      <button id="clear-tasks">Clear All</button>
     </form>
-
+    <div id="sorting-options">
+      <button id="sort-ascending">Sort Ascending</button>
+      <button id="sort-descending">Sort Descending</button>
+    </div>
     <div id="list">
       <h2>My Todos</h2>
       <ul id="tasks">
       </ul>
     </div>
-
-    <script src="./src/index.js"></script>
   </div>
-
 </body>
 </html>
